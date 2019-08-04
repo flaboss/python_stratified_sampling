@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Functions
-def stratified_sample(df, strata, size=None, seed=None):
+def stratified_sample(df, strata, size=None, seed=None, keep_index= True):
     '''
     It samples data from a pandas dataframe using strata. These functions use
     proportionate stratification:
@@ -18,7 +18,6 @@ def stratified_sample(df, strata, size=None, seed=None):
         - N1 is the population size of stratum 1
         - N is the total population size
         - n is the sampling size
-
     Parameters
     ----------
     :df: pandas dataframe from which data will be sampled.
@@ -26,25 +25,23 @@ def stratified_sample(df, strata, size=None, seed=None):
     :size: sampling size. If not informed, a sampling size will be calculated
         using Cochran adjusted sampling formula:
         cochran_n = (Z**2 * p * q) /e**2
-
         where:
             - Z is the z-value. In this case we use 1.96 representing 95%
             - p is the estimated proportion of the population which has an
                 attribute. In this case we use 0.5
             - q is 1-p
             - e is the margin of error
-
         This formula is adjusted as follows:
         adjusted_cochran = cochran_n / 1+((cochran_n -1)/N)
-
         where:
             - cochran_n = result of the previous formula
             - N is the population size
-
+    :seed: sampling seed
+    :keep_index: if True, it keeps a column with the original population index indicator
+    
     Returns
     -------
     A sampled pandas dataframe based in a set of strata.
-
     Examples
     --------
     >> df.head()
@@ -58,7 +55,6 @@ def stratified_sample(df, strata, size=None, seed=None):
     # This returns a sample stratified by sex and city containing 30% of the size of
     # the original data
     >> stratified = stratified_sample(df=df, strata=['sex', 'city'], size=0.3)
-
     Requirements
     ------------
     - pandas
@@ -91,14 +87,13 @@ def stratified_sample(df, strata, size=None, seed=None):
         
         # final dataframe
         if first:
-            stratified_df = df.query(qry).sample(n=n, random_state=seed).reset_index(drop=True)
+            stratified_df = df.query(qry).sample(n=n, random_state=seed).reset_index(drop=(not keep_index))
             first = False
         else:
-            tmp_df = df.query(qry).sample(n=n, random_state=seed).reset_index(drop=True)
+            tmp_df = df.query(qry).sample(n=n, random_state=seed).reset_index(drop=(not keep_index))
             stratified_df = stratified_df.append(tmp_df, ignore_index=True)
     
     return stratified_df
-
 
 
 def stratified_sample_report(df, strata, size=None):
