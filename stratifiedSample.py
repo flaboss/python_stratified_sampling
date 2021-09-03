@@ -62,10 +62,10 @@ def stratified_sample(df, strata, size=None, seed=None, keep_index= True):
     '''
     population = len(df)
     size = __smpl_size(population, size)
-    tmp = df[strata]
+    tmp = df.loc[:,strata]
     tmp['size'] = 1
     tmp_grpd = tmp.groupby(strata).count().reset_index()
-    tmp_grpd['samp_size'] = round(size/population * tmp_grpd['size']).astype(int)
+    tmp_grpd['samp_size'] = np.round(size/population * tmp_grpd['size']).astype(int)
 
     # controlling variable to create the dataframe or append to it
     first = True 
@@ -130,10 +130,10 @@ def stratified_sample_report(df, strata, size=None):
     '''
     population = len(df)
     size = __smpl_size(population, size)
-    tmp = df[strata]
+    tmp = df.loc[:,strata]
     tmp['size'] = 1
     tmp_grpd = tmp.groupby(strata).count().reset_index()
-    tmp_grpd['samp_size'] = round(size/population * tmp_grpd['size']).astype(int)
+    tmp_grpd['samp_size'] = np.round(size/population * tmp_grpd['size']).astype(int)
     return tmp_grpd
 
 
@@ -167,10 +167,10 @@ def __smpl_size(population, size):
         - stratified_sample_report
     '''
     if size is None:
-        cochran_n = round(((1.96)**2 * 0.5 * 0.5)/ 0.02**2)
-        n = round(cochran_n/(1+((cochran_n -1) /population)))
+        cochran_n = np.round(((1.96)**2 * 0.5 * 0.5)/ 0.02**2)
+        n = np.round(cochran_n/(1+((cochran_n -1) /population)))
     elif size >= 0 and size < 1:
-        n = round(population * size)
+        n = np.round(population * size)
     elif size < 0:
         raise ValueError('Parameter "size" must be an integer or a proportion between 0 and 0.99.')
     elif size >= 1:
